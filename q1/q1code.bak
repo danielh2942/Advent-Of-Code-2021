@@ -1,0 +1,16 @@
+#lang racket
+(define (question1 file-path)
+  (define count 0)
+  (define current -1)
+  (define (next-line-it file)
+    (let ((value (string->number (read-line file 'any))))
+          (if (not value)
+              count
+              (begin)
+              )
+          )
+      )
+    )
+  (call-with-input-file file-path next-line-it)
+  count)
+          
