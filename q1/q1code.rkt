@@ -44,6 +44,22 @@
       )
   )
 
+
+;;I looked around and realized that you do not need to actually perform
+;;the addition at any step and all you need to do is compare a value to one 3 indexes to the right
+;;of it so here's that :))
+(define (question1balt list1 list2 count)
+  (if (null? list2)
+      count
+      (begin
+        (when (> (car list2) (car list1))
+          (set! count (+ count 1)))
+        (question1balt (cdr list1) (cdr list2) count)
+        )
+      )
+  )
+
 (question1 "input.txt")
 (define nums (read-in-nums "input.txt"))
 (question1b nums -1 0)
+(question1balt nums (cdddr nums) 0)
