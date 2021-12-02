@@ -1,0 +1,11 @@
+#lang racket
+(define (file-reader file-path)
+  (define output '())
+  (define (next-line-it file)
+    (let ((line (read-line file 'any)))
+      (unless (eof-object? line)
+        (set! output (cons (string-split line) output))
+        (next-line-it file))))
+  (call-with-input-file file-path next-line-it))
+
+(file-reader "test.txt")
