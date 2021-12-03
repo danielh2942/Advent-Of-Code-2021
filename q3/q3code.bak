@@ -1,0 +1,12 @@
+#lang racket
+(define (read-in-nums file-path)
+  (define nums '())
+  (define (next-line-it file)
+    (let ((line (read-line file 'any)))
+      (unless (eof-object? line)
+        (set! nums (append nums (list (string->number line))))
+        (next-line-it file))))
+  (call-with-input-file file-path next-line-it)
+  nums)
+
+(read-in-nums "input.txt")
