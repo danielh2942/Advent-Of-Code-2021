@@ -8,14 +8,6 @@
         )
   )
 
-(define (get_smaller a b)
-  (if (< a b) a b)
-  )
-
-(define (get_bigger a b)
-  (if (< a b) b a)
-  )
-
 (define (string_list->num_list input)
   (if (null? input) '() (append (list (string->number(string-trim (car input)))) (string_list->num_list (cdr input))))
   )
@@ -43,14 +35,14 @@
   (define eval 0)
   (cond [(= (check_slope (car coords) (cadr coords)) 0) ;X
          (begin
-           (set! temp (get_smaller (caadr coords) (caar coords)))
+           (set! temp (min (caadr coords) (caar coords)))
            (for ([i (in-range 0 (+ (abs (- (caadr coords) (caar coords))) 1))])
              (set! ht (insert_into (+ temp i) (cadar coords) ht))
              )
            ht)]
         [(= (check_slope (car coords) (cadr coords)) 1) ;Y
          (begin
-           (set! temp (get_smaller (cadadr coords) (cadar coords)))
+           (set! temp (min (cadadr coords) (cadar coords)))
            (for ([i (in-range 0 (+ (abs (- (cadadr coords) (cadar coords))) 1))])
              (set! ht (insert_into (caar coords) (+ temp i) ht))
              )
@@ -60,15 +52,15 @@
            (set! eval (/ (- (cadadr coords) (cadar coords)) (- (caadr coords) (caar coords))))
            (cond [(= eval 1) ;;Smallest X, Smallest Y -> Biggest X, Biggest Y
                   (begin
-                    (set! temp (get_smaller (caar coords) (caadr coords)))
-                    (set! tempy (get_smaller (cadadr coords) (cadar coords)))
+                    (set! temp (min (caar coords) (caadr coords)))
+                    (set! tempy (min (cadadr coords) (cadar coords)))
                     )]
                  [(= eval -1) ;;Smallest X, Biggest Y -> Biggest X, Smallest Y
                   (begin
-                    (set! temp (get_smaller (caar coords) (caadr coords)))
-                    (set! tempy (get_bigger (cadadr coords) (cadar coords)))
+                    (set! temp (min (caar coords) (caadr coords)))
+                    (set! tempy (max (cadadr coords) (cadar coords)))
                     )])
-           (for ([i (in-range temp (+ (get_bigger (caar coords) (caadr coords))1))])
+           (for ([i (in-range temp (+ (max (caar coords) (caadr coords))1))])
              (set! ht (insert_into i tempy ht))
              (set! tempy (+ tempy eval))
              )
