@@ -9,24 +9,15 @@
   )
 
 (define (get_smaller a b)
-  (if (< a b)
-      a
-      b
-      )
+  (if (< a b) a b)
   )
 
 (define (get_bigger a b)
-  (if (< a b)
-      b
-      a
-      )
+  (if (< a b) b a)
   )
 
 (define (string_list->num_list input)
-  (if (null? input)
-      '()
-       (append (list (string->number(string-trim (car input)))) (string_list->num_list (cdr input)))
-      )
+  (if (null? input) '() (append (list (string->number(string-trim (car input)))) (string_list->num_list (cdr input))))
   )
 
 (define (parse_line input)
@@ -35,11 +26,16 @@
   )
 
 (define (parse_list input)
-  (if (null? input)
-      '()
-      (append (list (parse_line (car input))) (parse_list (cdr input)))
-      )
+  (if (null? input) '() (append (list (parse_line (car input))) (parse_list (cdr input))))
   )
+
+(define (insert_into x y ht)
+  (when (not (hash-ref ht x #f)) (hash-set! ht x (make-hash)))
+  (if (not (hash-ref (hash-ref ht x) y #f))
+      (hash-set! (hash-ref ht x) y 1)
+      (hash-set! (hash-ref ht x) y (+ (hash-ref (hash-ref ht x) y) 1))
+      )
+  ht)
 
 (define (from-until coords ht)
   (define temp 0)
@@ -49,27 +45,14 @@
          (begin
            (set! temp (get_smaller (caadr coords) (caar coords)))
            (for ([i (in-range 0 (+ (abs (- (caadr coords) (caar coords))) 1))])
-             (when (not (hash-ref ht (+ temp i) #f))
-               (hash-set! ht (+ temp i) (make-hash))
-               )
-             (if (not (hash-ref (hash-ref ht (+ temp i)) (cadar coords) #f))
-                 (hash-set! (hash-ref ht (+ temp i)) (cadar coords) 1)
-                 (hash-set! (hash-ref ht (+ temp i)) (cadar coords) (+ (hash-ref (hash-ref ht (+ temp i)) (cadar coords)) 1))
-                 )
+             (set! ht (insert_into (+ temp i) (cadar coords) ht))
              )
            ht)]
         [(= (check_slope (car coords) (cadr coords)) 1) ;Y
          (begin
            (set! temp (get_smaller (cadadr coords) (cadar coords)))
            (for ([i (in-range 0 (+ (abs (- (cadadr coords) (cadar coords))) 1))])
-             (if (not (hash-ref ht (caar coords) #f))
-               (hash-set! ht (caar coords) (make-hash))
-               (display "")
-               )
-             (if (not (hash-ref (hash-ref ht (caar coords)) (+ temp i) #f))
-                 (hash-set! (hash-ref ht (caar coords)) (+ temp i) 1)
-                 (hash-set! (hash-ref ht (caar coords)) (+ temp i) (+ (hash-ref (hash-ref ht (caar coords)) (+ temp i)) 1))
-                 )
+             (set! ht (insert_into (caar coords) (+ temp i) ht))
              )
              ht)]
         [else
@@ -86,12 +69,7 @@
                     (set! tempy (get_bigger (cadadr coords) (cadar coords)))
                     )])
            (for ([i (in-range temp (+ (get_bigger (caar coords) (caadr coords))1))])
-             (when (not (hash-ref ht i #f))
-                 (hash-set! ht i (make-hash)))
-             (if (not (hash-ref (hash-ref ht i) tempy #f))
-                 (hash-set! (hash-ref ht i) tempy 1)
-                 (hash-set! (hash-ref ht i) tempy (+ (hash-ref (hash-ref ht i) tempy) 1))
-                 )
+             (set! ht (insert_into i tempy ht))
              (set! tempy (+ tempy eval))
              )
            ht)]
@@ -99,10 +77,7 @@
   )
 
 (define (map_out coords ht)
-  (if (null? coords)
-      ht
-      (map_out (cdr coords) (from-until (car coords) ht))
-      )
+  (if (null? coords) ht (map_out (cdr coords) (from-until (car coords) ht)))
   )
 
 (define (counter ht)
@@ -112,14 +87,12 @@
       (for ([ j (in-range 0 1001)])
         (when (hash-ref (hash-ref ht i #f) j #f)
           (when (>= (hash-ref (hash-ref ht i) j) 2)
-            (set! counterval (+ counterval 1))
-            )
+            (set! counterval (+ counterval 1)))
           )
         )
       )
     )
-  counterval
-  )
+  counterval)
 
 (define ht (make-hash))
 (define instruct (parse_list (file->lines "input.txt")))
