@@ -4,29 +4,23 @@
       (cond
         [(= (- (car p2) (car p1)) 0) 1]
         [(= (- (cadr p2) (cadr p1)) 0) 0]
-        [else -1]
-        )
-  )
+        [else -1]))
 
 (define (string_list->num_list input)
-  (if (null? input) '() (append (list (string->number(string-trim (car input)))) (string_list->num_list (cdr input))))
-  )
+  (if (null? input) '() (append (list (string->number(string-trim (car input)))) (string_list->num_list (cdr input)))))
 
 (define (parse_line input)
   (define temp (string-split input "->"))
-  (append (list (string_list->num_list (string-split (car temp) ","))) (list (string_list->num_list (string-split (cadr temp) ","))))
-  )
+  (append (list (string_list->num_list (string-split (car temp) ","))) (list (string_list->num_list (string-split (cadr temp) ",")))))
 
 (define (parse_list input)
-  (if (null? input) '() (append (list (parse_line (car input))) (parse_list (cdr input))))
-  )
+  (if (null? input) '() (append (list (parse_line (car input))) (parse_list (cdr input)))))
 
 (define (insert_into x y ht)
   (when (not (hash-ref ht x #f)) (hash-set! ht x (make-hash)))
   (if (not (hash-ref (hash-ref ht x) y #f))
       (hash-set! (hash-ref ht x) y 1)
-      (hash-set! (hash-ref ht x) y (+ (hash-ref (hash-ref ht x) y) 1))
-      )
+      (hash-set! (hash-ref ht x) y (+ (hash-ref (hash-ref ht x) y) 1)))
   ht)
 
 (define (from-until coords ht)
@@ -44,8 +38,7 @@
          (begin
            (set! temp (min (cadadr coords) (cadar coords)))
            (for ([i (in-range 0 (+ (abs (- (cadadr coords) (cadar coords))) 1))])
-             (set! ht (insert_into (caar coords) (+ temp i) ht))
-             )
+             (set! ht (insert_into (caar coords) (+ temp i) ht)))
              ht)]
         [else
          (begin ;;45 Degrees -Just comment this section out for Part 1 lol
@@ -62,15 +55,11 @@
                     )])
            (for ([i (in-range temp (+ (max (caar coords) (caadr coords))1))])
              (set! ht (insert_into i tempy ht))
-             (set! tempy (+ tempy eval))
-             )
-           ht)]
-        )
-  )
+             (set! tempy (+ tempy eval)))
+           ht)]))
 
 (define (map_out coords ht)
-  (if (null? coords) ht (map_out (cdr coords) (from-until (car coords) ht)))
-  )
+  (if (null? coords) ht (map_out (cdr coords) (from-until (car coords) ht))))
 
 (define (counter ht)
   (define counterval 0)
@@ -79,11 +68,7 @@
       (for ([ j (in-range 0 1001)])
         (when (hash-ref (hash-ref ht i #f) j #f)
           (when (>= (hash-ref (hash-ref ht i) j) 2)
-            (set! counterval (+ counterval 1)))
-          )
-        )
-      )
-    )
+            (set! counterval (+ counterval 1)))))))
   counterval)
 
 (define ht (make-hash))
