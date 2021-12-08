@@ -47,19 +47,7 @@
             [(7) (set! seven (+ seven 1))]
             [(8) (set! eight (+ eight 1))])
           (question1inner (cdr input) one four seven eight))))
-  (question1inner input 0 0 0 0)
-  )
-
-(define (make_num_from_seg input)
-  (define (make_num_inner input tally)
-    (if (null? input)
-        (begin
-          (display tally)
-          (display "\n")
-          tally)
-        (make_num_inner (cdr input) (+ (* tally 10) (get_seven_seg (car input))))))
-  (make_num_inner input 0))
-
+  (question1inner input 0 0 0 0))
 
 (define (get_output inpt)
   (if (null? inpt)
@@ -76,9 +64,6 @@
       '()
       (append (string-split (car input)) (make_list_out (cdr input)))))
 
-(define (gen_discrim input)
-  (define discrim (sort (string-split input) string-length<?))
-  (display discrim))
 
 #|
 1 = pos 0
@@ -98,30 +83,30 @@
 (define (generate_filter_list inpt)
   (define discrim '(-1 0 -1 -1 2 -1 -1 1 9 -1))
   (define outpt '())
-  (when (not (filter_against (nth 6 inpt) (nth 1 inpt))) ;; pos 6 is 6
-    (if (filter_against (nth 7 inpt) (nth 2 inpt)) ;;pos 7 is 9
+  (if (not (filter_against (nth 6 inpt) (nth 1 inpt)))     ;; pos 6 is 6
+    (if (filter_against (nth 7 inpt) (nth 2 inpt))         ;;pos 7 is 9
         (set! discrim (list 8 0 0 0 2 0 6 1 9 7))
-        (set! discrim (list 7 0 0 0 2 0 6 1 9 8))))
-  (when (not (filter_against (nth 7 inpt) (nth 1 inpt))) ;;pos 7 is 6
-    (if (filter_against (nth 6 inpt) (nth 2 inpt))
-        (set! discrim (list 8 0 0 0 2 0 7 1 9 6))
-        (set! discrim (list 6 0 0 0 2 0 7 1 9 8))))
-  (when (not (filter_against (nth 8 inpt) (nth 1 inpt))) ;;pos 8 is 6
-    (if (filter_against (nth 7 inpt) (nth 2 inpt))
-        (set! discrim (list 6 0 0 0 2 0 8 1 9 7))
-        (set! discrim (list 7 0 0 0 2 0 8 1 9 6))))
-  (when (filter_against (nth 3 inpt) (nth 1 inpt)) ;; pos 3 is 3
+        (set! discrim (list 7 0 0 0 2 0 6 1 9 8)))
+    (begin
+      (if (not (filter_against (nth 7 inpt) (nth 1 inpt))) ;;pos 7 is 6
+        (if (filter_against (nth 6 inpt) (nth 2 inpt))
+            (set! discrim (list 8 0 0 0 2 0 7 1 9 6))
+            (set! discrim (list 6 0 0 0 2 0 7 1 9 8)))
+        (if (filter_against (nth 7 inpt) (nth 2 inpt))     ;;pos 8 is 6
+            (set! discrim (list 6 0 0 0 2 0 8 1 9 7))
+            (set! discrim (list 7 0 0 0 2 0 8 1 9 6))))))
+  (if (filter_against (nth 3 inpt) (nth 1 inpt))           ;; pos 3 is 3
     (if (filter_against (nth (nth 9 discrim) inpt) (nth 4 inpt) ) ;;pos 4 is 5
         (set! discrim (append (xuntily 0 1 discrim) (list 5 3 2 4) (xuntily 6 9 discrim)))
-        (set! discrim (append (xuntily 0 1 discrim) (list 4 3 2 5) (xuntily 6 9 discrim)))))
-  (when (filter_against (nth 4 inpt) (nth 1 inpt)) ;;pos 4 is 3
-    (if (filter_against (nth (nth 9 discrim) inpt) (nth 5 inpt) ) ;;pos 5 is 5
-        (set! discrim (append (xuntily 0 1 discrim) (list 3 4 2 5) (xuntily 6 9 discrim)))
-        (set! discrim (append (xuntily 0 1 discrim) (list 5 4 2 3) (xuntily 6 9 discrim)))))
-  (when (filter_against (nth 5 inpt) (nth 1 inpt)) ;;pos  5 is 3
-    (if (filter_against (nth (nth 9 discrim) inpt) (nth 3 inpt)) ;;pos 3 is 5
-        (set! discrim (append (xuntily 0 1 discrim) (list 4 5 2 3) (xuntily 6 9 discrim)))
-        (set! discrim (append (xuntily 0 1 discrim) (list 3 5 2 4) (xuntily 6 9 discrim)))))
+        (set! discrim (append (xuntily 0 1 discrim) (list 4 3 2 5) (xuntily 6 9 discrim))))
+    (begin
+      (if (filter_against (nth 4 inpt) (nth 1 inpt))       ;;pos 4 is 3
+          (if (filter_against (nth (nth 9 discrim) inpt) (nth 5 inpt) ) ;;pos 5 is 5
+              (set! discrim (append (xuntily 0 1 discrim) (list 3 4 2 5) (xuntily 6 9 discrim)))
+              (set! discrim (append (xuntily 0 1 discrim) (list 5 4 2 3) (xuntily 6 9 discrim))))
+          (if (filter_against (nth (nth 9 discrim) inpt) (nth 3 inpt)) ;;pos 3 is 5, pos 5 is 3
+              (set! discrim (append (xuntily 0 1 discrim) (list 4 5 2 3) (xuntily 6 9 discrim)))
+              (set! discrim (append (xuntily 0 1 discrim) (list 3 5 2 4) (xuntily 6 9 discrim)))))))
   (for ([i (in-range 0 10)])
     (set! outpt (append outpt (list (nth (nth i discrim) inpt)))))
   outpt)
@@ -161,4 +146,4 @@
 
 (define inpt (file->lines "input.txt"))
 (question_1 (make_list_out  (get_output inpt)))
-(question_2 (get_input_output inpt)) ;;Magic number that fixes everything :)
+(question_2 (get_input_output inpt))
