@@ -69,7 +69,40 @@
       (send dc draw-rectangle (* 10 x) (* 10 y) 10 10)))
     (send bmp1 save-file "output.png" 'png))
 
+
+(define (check_neighbors mat x y)
+  (define ht (make-hash))
+  (define (check_neighbors_inner mat x y)
+    (cond
+      [(or (< x 0) (> x 99) (< y 0) (> y 99)) 0] 
+      [(= (matrix-ref mat x y) 9) 0]
+      [(hash-ref ht (cons x y) #f) 0]
+      [else
+       (begin
+         (hash-set! ht (cons x y) #t)
+         (+ 1
+            (check_neighbors_inner mat x (+ y 1))
+            (check_neighbors_inner mat x (- y 1))
+            (check_neighbors_inner mat (+ x 1) y)
+            (check_neighbors_inner mat (- x 1) y)))]))
+  (check_neighbors_inner mat x y))
+
+(define (q2_auto input)
+  (define ht (make-hash))
+  (define val 0)
+  (for ([i 100])
+    (for ([j 100])
+      (set! val (check_neighbors input i j))
+      (if (not (hash-ref ht val #f))
+          (hash-set! ht val 1)
+          (hash-set! ht val (+ (hash-ref ht val) 1)))))
+  (for ([i 200])
+    (when (and (hash-ref ht i #f) (not (= i 0)))
+      (hash-set! ht i (/ (hash-ref ht i) i))))
+  ht)
+
 (define a (split_into_nums (file->lines "input.txt")))
 (define mat (list->matrix 100 100 (flatten a)))
 (question1 mat)
 (question2_visual mat)
+(q2_auto mat)
